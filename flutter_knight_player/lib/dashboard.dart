@@ -1,6 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:flutter_knight_player/decorations/colors.dart';
 import 'screens/folders/folders.dart';
 import 'screens/try.dart';
 //import 'screens/player.dart';
@@ -46,7 +47,7 @@ class _DashBoardState extends State<DashBoard> {
                   iconSize: 30,
                   selectedFontSize: 20,
                   unselectedItemColor: Colors.grey,
-                  selectedItemColor: Colors.purple,
+                  selectedItemColor: KnightColors().secondaryColor(),
                   // called when one tab is selected
                   onTap: (int index) {
                     setState(() {
@@ -87,8 +88,8 @@ class _DashBoardState extends State<DashBoard> {
 
                   unselectedLabelTextStyle: const TextStyle(),
                   // Called when one tab is selected
-                  leading: Column(
-                    children: const [
+                  leading: const Column(
+                    children: [
                       SizedBox(
                         height: 30,
                       ),

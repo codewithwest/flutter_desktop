@@ -1,6 +1,8 @@
 import 'dart:io';
 //import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_knight_player/decorations/colors.dart';
+import 'package:flutter_knight_player/decorations/decoration.dart';
 import 'package:mime/mime.dart';
 import '../player.dart';
 
@@ -154,10 +156,8 @@ class _FoldersState extends State<Folders> {
 
     isAudioFileReturn(String confirm) {
       if (confirm.startsWith('audio/')) {
-        print(true);
         return true;
       } else {
-        print(ty);
         return false;
       }
     }
@@ -186,11 +186,11 @@ class _FoldersState extends State<Folders> {
               child: Container(
                   margin: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                      color: const Color.fromRGBO(22, 22, 22, 0.95),
+                      color: KnightColors().primaryTabColor(),
                       border: Border.all(),
-                      boxShadow: const [
+                      boxShadow: [
                         BoxShadow(
-                          color: Color.fromARGB(190, 90, 33, 87),
+                          color: KnightColors().secondaryColor(),
                           blurRadius: 5,
                           blurStyle: BlurStyle.solid,
                         )
@@ -209,8 +209,10 @@ class _FoldersState extends State<Folders> {
                           }),
                           icon: Icon(
                             routeLength ? Icons.home : Icons.arrow_back,
-                            shadows: const [
-                              Shadow(color: Colors.purple, blurRadius: 10)
+                            shadows: [
+                              Shadow(
+                                  color: KnightColors().secondaryColor(),
+                                  blurRadius: 10)
                             ],
                           ),
                           iconSize: 35,
@@ -238,33 +240,43 @@ class _FoldersState extends State<Folders> {
                               child: Text(
                                 locationTracker,
                                 style: const TextStyle(
-                                    fontSize: 22, overflow: TextOverflow.fade),
+                                  fontSize: 22,
+                                  overflow: TextOverflow.fade,
+                                ),
                               )))
                     ],
                   ))),
 
           Expanded(
             child: Container(
-              color: Colors.black,
+              margin: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+              color: KnightColors().tabColor(),
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: existingDir.length,
                 itemBuilder: (context, index) {
-                  return (Container(
+                  return Container(
                     margin: const EdgeInsetsDirectional.all(5),
                     child: ElevatedButton(
-                      child: const Column(
+                      style: AllMusicDecorations().buttonDecoration(),
+                      child: Column(
                         children: [
                           Icon(
-                            Icons.folder,
-                            size: 36,
+                            existingDir[index].toString().contains('c:')
+                                ? Icons.window_sharp
+                                : Icons.drive_file_move,
+                            size: 35,
                           ),
-                          Text('data')
+                          Text(existingDir[index]
+                              .toString()
+                              .toUpperCase()
+                              .replaceAll(RegExp(r'DIRECTORY:'), 'DRIVE')
+                              .replaceAll(RegExp(r"'"), ''))
                         ],
                       ),
                       onPressed: () => {},
                     ),
-                  ));
+                  );
                 },
               ),
             ),

@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_knight_player/decorations/decoration.dart';
 import 'package:flutter_knight_player/screens/all_music/functions.dart';
-import 'package:get/get.dart';
-import 'package:mime/mime.dart';
+import 'package:flutter_media_metadata/flutter_media_metadata.dart';
 
 //import 'package:open_file/open_file.dart';
 // import 'package:path/path.dart';
@@ -22,85 +22,117 @@ class _AllMusicState extends State<AllMusic> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    // Assign The list of directories
-    Directory dir = Directory('H:');
-    getDirectoryChildren(dir, setState);
-    // const AsyncSnapshot.waiting();
-    // print(allAudioFiles);
+    //Get The decoration Class
+    var allMusicDecorator = AllMusicDecorations();
+    // Diractory to search
+    Directory dir = Directory('E:');
+    newAsyncMethod() async {
+      await sortDirectoryFiles(dir);
+      return allFilesList;
+    }
 
-    // fullList = getDirectoryChildren(dir, listOfDirectories, setState);
-    // print(listOfDirectories);
-    // ignore: avoid_print
-    // directoryListing.isNotEmpty ? print(directoryListing) : print('Émpty');
+    allFilesList.isEmpty ? newAsyncMethod() : allFilesList;
+
     return SafeArea(
-      child: Container(
-        color: Colors.red,
-        child: ListView.builder(
-          // scrollDirection: Axis.horizontal,
-          itemCount: allAudioFiles.length,
+        child: Column(children: [
+      Container(
+        margin: const EdgeInsets.fromLTRB(6, 3, 6, 2),
+        decoration: allMusicDecorator.topTabDecoration(),
+        height: height / 10.5,
+        padding: const EdgeInsets.fromLTRB(5, 5, 2, 2),
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          children: [
+            ElevatedButton(
+              child: Column(
+                children: [
+                  const Icon(
+                    Icons.audio_file,
+                    size: 36,
+                  ),
+                  Text(allFilesList.length.toString())
+                ],
+              ),
+              onPressed: () => {},
+            ),
+          ],
+        ),
+      ),
+      Expanded(
+        flex: 9,
+        child: GridView.builder(
+          // Create a grid with 2 columns. If you change the scrollDirection to
+          // horizontal, this produces 2 rows.
+          scrollDirection: Axis.vertical,
+          padding: const EdgeInsets.symmetric(horizontal: 5),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: MediaQuery.of(context).size.width < 800
+                ? MediaQuery.of(context).size.width < 500
+                    ? MediaQuery.of(context).size.width < 300
+                        ? 1
+                        : 2
+                    : 3
+                : 5,
+            childAspectRatio: 1,
+            crossAxisSpacing: 2,
+          ),
+          itemCount: allFilesList.length,
           itemBuilder: (context, index) {
-            return (Container(
-              margin: const EdgeInsetsDirectional.all(5),
+            return Container(
+              decoration: allMusicDecorator.songCardDecoration(),
+              margin: const EdgeInsetsDirectional.all(3),
               child: ElevatedButton(
+                style: allMusicDecorator.buttonDecoration(),
                 child: Column(
                   children: [
-                    const Icon(
-                      Icons.folder,
-                      size: 36,
-                    ),
-                    Text('${allAudioFiles.elementAt(index)}')
+                    Expanded(
+                        flex: 9,
+                        child: Container(
+                          decoration: allMusicDecorator.imageContainer(),
+                          margin: const EdgeInsets.all(2),
+                        )),
+                    Expanded(
+                        flex: 3,
+                        child: Container(
+                          width: width,
+                          decoration: allMusicDecorator.textContainer(),
+                          margin: const EdgeInsets.all(2),
+                          child: Center(
+                              child: allMusicDecorator.childText(
+                                  allFilesList[index], context)),
+                        ))
                   ],
                 ),
-                onPressed: () => {},
+                onPressed: () async {
+                  var metadata = await MetadataRetriever.fromFile(
+                      (File(allFilesList[index].toString())));
+                  try {
+                    print(metadata);
+                  } catch (e) {
+                    print(e);
+                  }
+
+// String? trackName = metadata.trackName;
+// List<String>? trackArtistNames = metadata.trackArtistNames;
+// String? albumName = metadata.albumName;
+// String? albumArtistName = metadata.albumArtistName;
+// int? trackNumber = metadata.trackNumber;
+// int? albumLength = metadata.albumLength;
+// int? year = metadata.year;
+// String? genre = metadata.genre;
+// String? authorName = metadata.authorName;
+// String? writerName = metadata.writerName;
+// int? discNumber = metadata.discNumber;
+// String? mimeType = metadata.mimeType;
+// int? trackDuration = metadata.trackDuration;
+// int? bitrate = metadata.bitrate;
+// Uint8List? albumArt = metadata.albumArt;
+                },
               ),
-            ));
+            );
           },
         ),
       ),
-      //     child: ListView.builder(
-      //         // future: getDirectoryChildren(dir, setState),
-      //         builder: (context, AsyncSnapshot snapshot) {
-      //   if (!snapshot.hasData) {
-      //     // CircularProgressIndicator();
-      //     return Center(child: Text('Waiting'));
-      //   } else {
-      //     return Container(
-      //         child: ListView.builder(
-      //             itemCount: allAudioFiles.length,
-      //             scrollDirection: Axis.horizontal,
-      //             itemBuilder: (BuildContext context, int index) {
-      //               return Text('${allAudioFiles.elementAt(index)}');
-      //             }));
-      //   }
-      // })
-      // )
-      // ElevatedButton(
-      //     onPressed: (() => {direct.isNotEmpty ? fetchSubDir(direct) : true}),
-      //     child: const Icon(Icons.rule)),
-      // Text(audioFiles.length.toString()),
-      // Expanded(
-      //     child: ListView.builder(
-      //         scrollDirection: Axis.vertical,
-      //         itemCount: audioFiles.length,
-      //         itemBuilder: ((context, index) {
-      //           return ListTile(
-      //               style: ListTileStyle.drawer,
-      //               leading: const Icon(
-      //                 Icons.label,
-      //                 size: 36,
-      //               ),
-      //               iconColor: const Color.fromRGBO(22, 150, 55, 7),
-      //               dense: true,
-      //               enabled: true,
-      //               contentPadding: const EdgeInsets.all(5),
-      //               minVerticalPadding: 10,
-      //               hoverColor: const Color.fromRGBO(222, 22, 22, 0.6),
-      //               visualDensity: VisualDensity.adaptivePlatformDensity,
-      //               enableFeedback: true,
-      //               autofocus: true,
-      //               trailing: Text(index.toString()),
-      //               title: Text(audioFiles.toList()[index].toString()));
-      //         },),),),
-    );
+    ]));
   }
 }
