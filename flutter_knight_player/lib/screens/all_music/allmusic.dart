@@ -24,8 +24,9 @@ class _AllMusicState extends State<AllMusic> {
     double height = MediaQuery.of(context).size.height;
     //Get The decoration Class
     var allMusicDecorator = AllMusicDecorations();
+    bool listView = false;
     // Diractory to search
-    Directory dir = Directory('E:');
+    Directory dir = Directory('H:');
     newAsyncMethod() async {
       await sortDirectoryFiles(dir);
       return allFilesList;
@@ -44,73 +45,86 @@ class _AllMusicState extends State<AllMusic> {
           scrollDirection: Axis.horizontal,
           children: [
             ElevatedButton(
-              child: Column(
-                children: [
-                  const Icon(
-                    Icons.audio_file,
-                    size: 36,
-                  ),
-                  Text(allFilesList.length.toString())
-                ],
+              child: Center(
+                child: Column(
+                  children: [
+                    Text(allFilesList.length.toString()),
+                    const Text('Songs')
+                  ],
+                ),
               ),
               onPressed: () => {},
             ),
+            Container(
+              child: IconButton(
+                icon: Icon(listView == false ? Icons.list : Icons.window),
+                onPressed: () => {setState(() => !listView)},
+              ),
+            )
           ],
         ),
       ),
       Expanded(
         flex: 9,
-        child: GridView.builder(
-          // Create a grid with 2 columns. If you change the scrollDirection to
-          // horizontal, this produces 2 rows.
-          scrollDirection: Axis.vertical,
-          padding: const EdgeInsets.symmetric(horizontal: 5),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: MediaQuery.of(context).size.width < 800
-                ? MediaQuery.of(context).size.width < 500
-                    ? MediaQuery.of(context).size.width < 300
-                        ? 1
-                        : 2
-                    : 3
-                : 5,
-            childAspectRatio: 1,
-            crossAxisSpacing: 2,
-          ),
-          itemCount: allFilesList.length,
-          itemBuilder: (context, index) {
-            return Container(
-              decoration: allMusicDecorator.songCardDecoration(),
-              margin: const EdgeInsetsDirectional.all(3),
-              child: ElevatedButton(
-                style: allMusicDecorator.buttonDecoration(),
-                child: Column(
-                  children: [
-                    Expanded(
-                        flex: 9,
-                        child: Container(
-                          decoration: allMusicDecorator.imageContainer(),
-                          margin: const EdgeInsets.all(2),
-                        )),
-                    Expanded(
-                        flex: 3,
-                        child: Container(
-                          width: width,
-                          decoration: allMusicDecorator.textContainer(),
-                          margin: const EdgeInsets.all(2),
-                          child: Center(
-                              child: allMusicDecorator.childText(
-                                  allFilesList[index], context)),
-                        ))
-                  ],
+        child: listView == true
+            ? ListView.builder(itemBuilder: (context, index) {
+                return ListTile(
+                  iconColor: Colors.green,
+                  leading: Icon(Icons.music_note),
+                  title: allFilesList[index],
+                );
+              })
+            : GridView.builder(
+                // Create a grid with 2 columns. If you change the scrollDirection to
+                // horizontal, this produces 2 rows.
+                scrollDirection: Axis.vertical,
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: MediaQuery.of(context).size.width < 800
+                      ? MediaQuery.of(context).size.width < 500
+                          ? MediaQuery.of(context).size.width < 300
+                              ? 1
+                              : 2
+                          : 3
+                      : 5,
+                  childAspectRatio: 1,
+                  crossAxisSpacing: 2,
                 ),
-                onPressed: () async {
-                  var metadata = await MetadataRetriever.fromFile(
-                      (File(allFilesList[index].toString())));
-                  try {
-                    print(metadata);
-                  } catch (e) {
-                    print(e);
-                  }
+                itemCount: allFilesList.length,
+                itemBuilder: (context, index) {
+                  return Container(
+                    decoration: allMusicDecorator.songCardDecoration(),
+                    margin: const EdgeInsetsDirectional.all(3),
+                    child: ElevatedButton(
+                      style: allMusicDecorator.buttonDecoration(),
+                      child: Column(
+                        children: [
+                          Expanded(
+                              flex: 9,
+                              child: Container(
+                                decoration: allMusicDecorator.imageContainer(),
+                                margin: const EdgeInsets.all(2),
+                              )),
+                          Expanded(
+                              flex: 3,
+                              child: Container(
+                                width: width,
+                                decoration: allMusicDecorator.textContainer(),
+                                margin: const EdgeInsets.all(2),
+                                child: Center(
+                                    child: allMusicDecorator.childText(
+                                        allFilesList[index], context)),
+                              ))
+                        ],
+                      ),
+                      onPressed: () async {
+                        var metadata = await MetadataRetriever.fromFile(
+                            (File(allFilesList[index].toString())));
+                        try {
+                          print(metadata);
+                        } catch (e) {
+                          print(e);
+                        }
 
 // String? trackName = metadata.trackName;
 // List<String>? trackArtistNames = metadata.trackArtistNames;
@@ -127,11 +141,11 @@ class _AllMusicState extends State<AllMusic> {
 // int? trackDuration = metadata.trackDuration;
 // int? bitrate = metadata.bitrate;
 // Uint8List? albumArt = metadata.albumArt;
+                      },
+                    ),
+                  );
                 },
               ),
-            );
-          },
-        ),
       ),
     ]));
   }
