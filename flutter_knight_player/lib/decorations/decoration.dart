@@ -27,6 +27,14 @@ class AllMusicDecorations extends KnightColors {
     );
   }
 
+  listButtonDecoration() {
+    return ButtonStyle(
+      shadowColor: MaterialStateProperty.all<Color>(Colors.green),
+      backgroundColor:
+          MaterialStateProperty.all<Color>(KnightColors().secondaryColor()),
+    );
+  }
+
   songCardDecoration() {
     return BoxDecoration(
         borderRadius: BorderRadius.circular(10),
@@ -60,12 +68,16 @@ class AllMusicDecorations extends KnightColors {
     );
   }
 
-  childText(childToElement, context) {
+  cleanMusicListText(childToElement) {
     var cleanedStr = childToElement.toString().replaceAll('\'', "");
     cleanedStr = cleanedStr.substring(
         cleanedStr.lastIndexOf("\\") + 1, cleanedStr.length);
+    return cleanedStr;
+  }
+
+  childText(childToElement, context) {
     return Text(
-      cleanedStr,
+      cleanMusicListText(childToElement),
       textAlign: TextAlign.center,
       softWrap: true,
       style: TextStyle(

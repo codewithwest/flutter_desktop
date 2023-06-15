@@ -71,7 +71,6 @@ class _PlayerState extends State<Player> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    print(lookupMimeType(widget.provideUrl));
     return Container(
       //margin: EdgeInsets.fromLTRB(width / 2, height / 2, 2, height / 11),
       height: height / 2.5,
