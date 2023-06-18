@@ -38,6 +38,7 @@ dependencies:
   mime: ^1.0.4
   audioplayers: ^4.1.0
   flutter_media_metadata: ^1.0.0
+  shared_preferences: ^2.1.2
 
 dev_dependencies:
   flutter_test:

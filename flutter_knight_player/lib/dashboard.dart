@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_knight_player/decorations/colors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/folders/folders.dart';
 import 'screens/try.dart';
 //import 'screens/player.dart';
@@ -20,7 +21,7 @@ class DashBoard extends StatefulWidget {
 
 class _DashBoardState extends State<DashBoard> {
   final List<Widget> _screens = [
-    const AllMusic(),
+    AllMusic(),
     const Folders(),
     const Favorites(),
     const Playlist(),
@@ -28,6 +29,7 @@ class _DashBoardState extends State<DashBoard> {
   ];
 
   int _selectedIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(

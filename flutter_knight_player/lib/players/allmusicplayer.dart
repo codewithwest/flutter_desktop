@@ -63,7 +63,14 @@ class _PlayerState extends State<AllMusicPlayer> {
         .replaceAll(RegExp(r"'"), '');
     player.setReleaseMode(ReleaseMode.loop);
     player.onSeekComplete;
-    widget.provideUrl.isEmpty ? true : await player.play(UrlSource(songName));
+    print(player.getDuration());
+    if (widget.provideUrl.isNotEmpty) {
+      try {
+        await player.play(UrlSource(songName));
+      } catch (e) {
+        widget.notifyParent("");
+      }
+    }
   }
 
   @override
@@ -137,10 +144,10 @@ class _PlayerState extends State<AllMusicPlayer> {
                 children: [
                   IconButton(
                     onPressed: (() {
-                      if (isPlaying) {
-                        widget.notifyParent("");
-                        player.stop();
-                      }
+                      // if (isPlaying) {
+                      widget.notifyParent("");
+                      player.stop();
+                      // }
                     }),
                     icon: const Icon(
                       Icons.stop,

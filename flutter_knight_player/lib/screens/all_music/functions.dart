@@ -1,45 +1,25 @@
-import 'dart:io';
 
-import 'package:mime/mime.dart';
-// ignore: avoid_print
-
-// import 'package:flutter/material.dart';
-
-toStringtoLower(el, String subStrCheck) {
-  return el.toString().toLowerCase().contains(subStrCheck);
-}
-
-var _directory = Directory('E:');
 
 var allDirectoryList = [];
 var allFilesList = [];
 
-sortDirectoryFiles(directoryToCheck) {
+sortDirectoryFiles(directoryToCheck) async {
+  // ignore: prefer_typing_uninitialized_variables
   var directoryList;
-  if (_directory.existsSync()) {
+
+  if (directoryToCheck.existsSync()) {
     try {
       directoryList = directoryToCheck.listSync().toList();
       for (var element in directoryList) {
         if (element.toString().contains('Directory:')) {
-          if (toStringtoLower(element, 'system') ||
-              toStringtoLower(element, 'program files') ||
-              toStringtoLower(element, 'programdata') ||
-              toStringtoLower(element, 'python') ||
-              toStringtoLower(element, 'windows') ||
-              toStringtoLower(element, 'apps') ||
-              toStringtoLower(element, 'backups') ||
-              toStringtoLower(element, 'dell') ||
-              toStringtoLower(element, 'drivers') ||
-              toStringtoLower(element, 'iteadmin') ||
-              toStringtoLower(element, 'intel') ||
-              toStringtoLower(element, 'onedrivetemp')) {
-          } else {
-            allDirectoryList.add(element);
-          }
+          allDirectoryList.add(element);
         } else {
           isAudioFileFormat(element.toString())
               ? allFilesList.add(element)
+              // [...{...ids}]
               : false;
+
+          allFilesList = allFilesList.toSet().toList();
         }
       }
       // dig deeper
@@ -56,7 +36,6 @@ sortDirectoryFiles(directoryToCheck) {
       print(err);
     }
   }
-  print(allFilesList);
 }
 
 isAudioFileFormat(String checkFile) {
@@ -77,4 +56,7 @@ isAudioFileFormat(String checkFile) {
       cleanedStr.substring(cleanedStr.lastIndexOf(".") + 1, cleanedStr.length);
   // var typeOfFile = lookupMimeType(check);
   return fileTypes.contains(cleanedStr) ? true : false;
+}
+toStringtoLower(el, String subStrCheck) {
+  return el.toString().toLowerCase().contains(subStrCheck);
 }
