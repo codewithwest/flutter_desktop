@@ -90,9 +90,8 @@ class _AllMusicListViewState extends State<AllMusicListView> {
                     ),
                     title: Text(AllMusicDecorations()
                         .cleanMusicListText(widget.allMusicList[index])),
-                    trailing: Text(getSongLength(widget.allMusicList[index])
-                        .hashCode
-                        .toString()),
+                    trailing: Text(
+                        widget.allMusicList[index].toString().substring(7, 9)),
                   )));
         });
   }

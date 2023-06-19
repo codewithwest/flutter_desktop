@@ -1,10 +1,10 @@
 //import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_knight_player/dashboard.dart';
 import 'package:get/get.dart';
-import 'dashboard.dart';
 // import 'package:bitsdojo_window/bitsdojo_window.dart';
 
-void main() {
+Future<void> main() async {
   //DartVLC.initialize();
   runApp(const MyApp());
   /*

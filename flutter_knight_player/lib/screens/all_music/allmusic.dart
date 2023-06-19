@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_knight_player/const/global.dart';
 import 'package:flutter_knight_player/decorations/decoration.dart';
 import 'package:flutter_knight_player/players/allmusicplayer.dart';
 import 'package:flutter_knight_player/screens/all_music/all_music_grid_view.dart';
 import 'package:flutter_knight_player/screens/all_music/all_music_list_view.dart';
-import 'package:flutter_knight_player/screens/all_music/functions.dart';
+import 'package:flutter_knight_player/screens/splashscreen/splash_widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 //import 'package:open_file/open_file.dart';
@@ -23,6 +24,7 @@ class _AllMusicState extends State<AllMusic> {
   List<String> allMusicFilesList = [];
   bool listView = true;
   bool accendingOrder = true;
+  bool allMusicLoaded = false;
   String urlToPlay = "";
   void refresh(urlToPass) {
     setState(() => urlToPlay = urlToPass);
@@ -35,12 +37,20 @@ class _AllMusicState extends State<AllMusic> {
     _sortAccendingOrder();
   }
 
+  check() async {
+    var ts = await AppGlobalFunctions().getAllMusicFilesFromAllDrives();
+    setState(() {
+      print("retrieves list of files = $ts");
+      _addMusicFilesToList(ts);
+      allMusicLoaded = true;
+    });
+  }
+
   void _loadCounter() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    // Directory dir = Directory('C:');
-    // allMusicFilesList.isEmpty ? await sortDirectoryFiles(dir) : true;
     setState(() {
       allMusicFilesList = prefs.getStringList('allMusicFileslist') ?? [];
+      allMusicFilesList.isEmpty ? check() : true;
     });
   }
 
@@ -66,10 +76,10 @@ class _AllMusicState extends State<AllMusic> {
 
   _getAllMusicFilesFromProvidedDrive(driveLetter) async {
     Directory dir = Directory("$driveLetter:");
-    await sortDirectoryFiles(dir);
-    _addMusicFilesToList(allFilesList);
+    await AppGlobalFunctions().sortDirectoryFiles(dir);
+    _addMusicFilesToList(AppGlobalsConst().allFilesList);
     setState(() {
-      allFilesList.toSet().toList();
+      AppGlobalsConst().allFilesList.toSet().toList();
     });
   }
 
@@ -95,7 +105,6 @@ class _AllMusicState extends State<AllMusic> {
     var allMusicDecorator = AllMusicDecorations();
     // Diractory to search
     // Directory dir = Directory('G:');
-
     changeView() {
       setState(() => listView = !listView);
     }
@@ -119,6 +128,18 @@ class _AllMusicState extends State<AllMusic> {
                     title: Text("${allMusicFilesList.length} Songs"),
                     // trailing:
                     //     Text('Total Time: ${allMusicFilesList.length * 60}'),
+                  ),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: ListTile(
+                    leading: const Icon(Icons.music_note),
+                    title: Text(
+                        "${AppGlobalsConst().allFilesList.length} All Files"),
+                    trailing: ElevatedButton(
+                      onPressed: () async => {check()},
+                      child: const Icon(Icons.local_activity),
+                    ),
                   ),
                 ),
                 // Music Contoller
@@ -149,7 +170,7 @@ class _AllMusicState extends State<AllMusic> {
                   child: IconButton(
                     tooltip: 'reload Songs',
                     icon: const Icon(Icons.add),
-                    onPressed: () => _getAllMusicFilesFromProvidedDrive('H'),
+                    onPressed: () => _getAllMusicFilesFromProvidedDrive('E'),
                   ),
                 ),
                 Expanded(
@@ -178,7 +199,10 @@ class _AllMusicState extends State<AllMusic> {
       Expanded(
           flex: 7,
           child: listView == true
-              ? AllMusicListView(
+              ?
+              // Is All music loaded
+
+              AllMusicListView(
                   allMusicList: allMusicFilesList.toSet().toList(),
                   urlToAssign: urlToPlay,
                   notifyParent: refresh,

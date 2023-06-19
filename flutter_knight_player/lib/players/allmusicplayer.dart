@@ -1,4 +1,4 @@
-import 'package:flutter_knight_player/decorations/colors.dart';
+import 'package:flutter_knight_player/const/colors.dart';
 import 'package:flutter_knight_player/decorations/decoration.dart';
 import 'package:mime/mime.dart';
 import 'package:audioplayers/audioplayers.dart';

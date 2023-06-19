@@ -1,7 +1,7 @@
 import 'dart:io';
 //import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_knight_player/decorations/colors.dart';
+import 'package:flutter_knight_player/const/colors.dart';
 import 'package:flutter_knight_player/decorations/decoration.dart';
 import 'package:mime/mime.dart';
 import '../player.dart';
