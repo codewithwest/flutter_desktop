@@ -1,6 +1,7 @@
 //import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_knight_player/dashboard.dart';
+import 'package:flutter_knight_player/screens/dashboard/dashboard.dart';
+import 'package:flutter_knight_player/screens/splashscreen/splashscreen.dart';
 import 'package:get/get.dart';
 // import 'package:bitsdojo_window/bitsdojo_window.dart';
 
@@ -18,15 +19,29 @@ Future<void> main() async {
   */
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+bool themeModeDark = true;
+
+class _MyAppState extends State<MyApp> {
+  changeTheme() {
+    setState(() {
+      print(themeModeDark);
+      themeModeDark = !themeModeDark;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       // debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(),
-      home: const DashBoard(),
+      theme: themeModeDark ? ThemeData.dark() : ThemeData.light(),
+      home: SplashScreen(notifyParentTheme: changeTheme),
     );
   }
 }

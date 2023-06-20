@@ -3,14 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_knight_player/const/global.dart';
 import 'package:flutter_knight_player/decorations/decoration.dart';
 import 'package:flutter_knight_player/players/allmusicplayer.dart';
+import 'package:flutter_knight_player/screens/all_music/add_folders_dialog.dart';
 import 'package:flutter_knight_player/screens/all_music/all_music_grid_view.dart';
 import 'package:flutter_knight_player/screens/all_music/all_music_list_view.dart';
-import 'package:flutter_knight_player/screens/splashscreen/splash_widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-//import 'package:open_file/open_file.dart';
-// import 'package:path/path.dart';
-// import 'package:path_provider/path_provider.dart';
 
 class AllMusic extends StatefulWidget {
   const AllMusic({super.key});
@@ -22,6 +18,8 @@ class AllMusic extends StatefulWidget {
 class _AllMusicState extends State<AllMusic> {
   TextEditingController dirName = TextEditingController();
   List<String> allMusicFilesList = [];
+  List<String> allFavouritesMusicList = [];
+  List allDrivesList = [];
   bool listView = true;
   bool accendingOrder = true;
   bool allMusicLoaded = false;
@@ -35,12 +33,12 @@ class _AllMusicState extends State<AllMusic> {
     super.initState();
     _loadCounter();
     _sortAccendingOrder();
+    _listOfDrives();
   }
 
   check() async {
     var ts = await AppGlobalFunctions().getAllMusicFilesFromAllDrives();
     setState(() {
-      print("retrieves list of files = $ts");
       _addMusicFilesToList(ts);
       allMusicLoaded = true;
     });
@@ -48,13 +46,16 @@ class _AllMusicState extends State<AllMusic> {
 
   void _loadCounter() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
     setState(() {
       allMusicFilesList = prefs.getStringList('allMusicFileslist') ?? [];
-      allMusicFilesList.isEmpty ? check() : true;
+      allFavouritesMusicList =
+          prefs.getStringList('allFavouritesMusicList') ?? [];
+      // allMusicFilesList.isEmpty ? check() : true;
     });
   }
 
-  void _addMusicFilesToList(allSearchedfileList) async {
+  _addMusicFilesToList(allSearchedfileList) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       for (var element in allSearchedfileList) {
@@ -63,6 +64,17 @@ class _AllMusicState extends State<AllMusic> {
             : allMusicFilesList.add(element.toString());
       }
       prefs.setStringList('allMusicFileslist', allMusicFilesList);
+    });
+  }
+
+  _addMusicFileToFavourites(clickedFile) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      allFavouritesMusicList.contains(clickedFile.toString())
+          ? allFavouritesMusicList.remove(clickedFile.toString())
+          : allFavouritesMusicList.add(clickedFile.toString());
+
+      prefs.setStringList('allFavouritesMusicList', allFavouritesMusicList);
     });
   }
 
@@ -76,10 +88,11 @@ class _AllMusicState extends State<AllMusic> {
 
   _getAllMusicFilesFromProvidedDrive(driveLetter) async {
     Directory dir = Directory("$driveLetter:");
-    await AppGlobalFunctions().sortDirectoryFiles(dir);
-    _addMusicFilesToList(AppGlobalsConst().allFilesList);
+    var returnedAllFilesList =
+        await AppGlobalFunctions().sortDirectoryFiles(dir);
+    await _addMusicFilesToList(returnedAllFilesList);
     setState(() {
-      AppGlobalsConst().allFilesList.toSet().toList();
+      returnedAllFilesList;
     });
   }
 
@@ -94,6 +107,15 @@ class _AllMusicState extends State<AllMusic> {
     setState(() {
       allMusicFilesList.sort((a, b) => b.length.compareTo(a.length));
       accendingOrder = false;
+    });
+  }
+
+  void _listOfDrives() async {
+    var newListOfDrives = await AppGlobalFunctions().getAllDrivesOnSystem();
+    setState(() {
+      for (var drive in newListOfDrives) {
+        allDrivesList.add(drive);
+      }
     });
   }
 
@@ -130,18 +152,7 @@ class _AllMusicState extends State<AllMusic> {
                     //     Text('Total Time: ${allMusicFilesList.length * 60}'),
                   ),
                 ),
-                Expanded(
-                  flex: 3,
-                  child: ListTile(
-                    leading: const Icon(Icons.music_note),
-                    title: Text(
-                        "${AppGlobalsConst().allFilesList.length} All Files"),
-                    trailing: ElevatedButton(
-                      onPressed: () async => {check()},
-                      child: const Icon(Icons.local_activity),
-                    ),
-                  ),
-                ),
+
                 // Music Contoller
                 urlToPlay.isEmpty == true
                     ? const Text('')
@@ -165,14 +176,6 @@ class _AllMusicState extends State<AllMusic> {
                         : _sortAccendingOrder(),
                   ),
                 ),
-                // Refresh music player
-                Expanded(
-                  child: IconButton(
-                    tooltip: 'reload Songs',
-                    icon: const Icon(Icons.add),
-                    onPressed: () => _getAllMusicFilesFromProvidedDrive('E'),
-                  ),
-                ),
                 Expanded(
                   child: IconButton(
                     tooltip: 'Reset All Music',
@@ -191,6 +194,15 @@ class _AllMusicState extends State<AllMusic> {
                     onPressed: () => changeView(),
                   ),
                 ),
+                Expanded(
+                  child: IconButton(
+                    tooltip: 'Add Music To Library',
+                    icon: const Icon(Icons.add_box),
+                    onPressed: () => loadDrivesDialog(context, allDrivesList,
+                        _getAllMusicFilesFromProvidedDrive),
+                  ),
+                ),
+                // showMyDialog(context)
               ],
             ),
           )),
@@ -206,6 +218,8 @@ class _AllMusicState extends State<AllMusic> {
                   allMusicList: allMusicFilesList.toSet().toList(),
                   urlToAssign: urlToPlay,
                   notifyParent: refresh,
+                  allFavoriteMusicList: allFavouritesMusicList,
+                  notifyParentfavourites: _addMusicFileToFavourites,
                 )
               : allMusicGridView(context, allMusicFilesList.toSet().toList())),
     ]));

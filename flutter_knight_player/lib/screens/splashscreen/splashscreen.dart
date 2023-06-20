@@ -1,13 +1,21 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_knight_player/dashboard.dart';
+import 'package:flutter_knight_player/screens/dashboard/dashboard.dart';
 import 'package:flutter_knight_player/decorations/decoration.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:animated_background/animated_background.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  final Function notifyParentTheme;
+
+  // ignore: prefer_typing_uninitialized_variables
+
+  const SplashScreen({
+    super.key,
+    // Key? key,
+    required this.notifyParentTheme,
+  });
+  // const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -49,13 +57,17 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Future.delayed(
-    //   const Duration(seconds: 25),
-    //   () => {
-    //     Navigator.push(
-    //         context, MaterialPageRoute(builder: (context) => const DashBoard()))
-    //   },
-    // );
+    Future.delayed(
+      const Duration(seconds: 2),
+      () => {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => DashBoard(
+                      notifyParentTheme: widget.notifyParentTheme,
+                    )))
+      },
+    );
     return SafeArea(
         child: Container(
       // Add box decoration

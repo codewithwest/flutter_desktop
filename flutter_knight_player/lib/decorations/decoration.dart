@@ -17,6 +17,21 @@ class AllMusicDecorations extends KnightColors {
         ]);
   }
 
+  folderDialog() {
+    return BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: KnightColors().secondaryColor(),
+        shape: BoxShape.rectangle,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 5,
+            blurRadius: 7,
+            offset: const Offset(0, 2), // changes position of shadow
+          )
+        ]);
+  }
+
   buttonDecoration() {
     return ButtonStyle(
       elevation: MaterialStateProperty.all<double>(5),

@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_knight_player/main.dart';
 import 'package:get/get.dart';
 // import 'player.dart';
 
 class Settings extends StatefulWidget {
-  const Settings({super.key});
+  // const Settings({super.key});
+  final Function notifyParentTheme;
+
+  // ignore: prefer_typing_uninitialized_variables
+
+  Settings({
+    Key? key,
+    required this.notifyParentTheme,
+  });
 
   @override
   State<Settings> createState() => _SettingsState();
@@ -23,11 +32,12 @@ class _SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
-    print(Get.isDarkMode);
-    return Container(
-      child: IconButton(
-        icon: Icon(Icons.abc),
-        onPressed: () => {themeState()},
+    // print(Get.isDarkMode);
+    return ListTile(
+      leading: IconButton(
+        icon: Icon(
+            themeModeDark ? Icons.abc_outlined : Icons.baby_changing_station),
+        onPressed: () => {widget.notifyParentTheme()},
       ),
     );
     //Get.to(Folders());

@@ -32,6 +32,7 @@ class AppGlobalsConst {
   ];
   // Stores The DirectoryList
   var allDirectoryList = [];
+  var allDrivesList = [];
   // Stores all Music Files
   var allFilesList = [];
   // List of All Music File Type
@@ -119,5 +120,15 @@ class AppGlobalFunctions extends AppGlobalsConst {
       }
     }
     return allFilesList;
+  }
+
+  getAllDrivesOnSystem() {
+    for (var char in AppGlobalsConst.letters) {
+      Directory newDir = Directory("${char.toUpperCase()}:");
+      if (newDir.existsSync()) {
+        allDrivesList.contains(newDir) ? true : allDrivesList.add(newDir);
+      }
+    }
+    return allDrivesList;
   }
 }
