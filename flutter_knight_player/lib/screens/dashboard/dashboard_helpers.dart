@@ -2,23 +2,37 @@ import 'package:flutter/material.dart';
 import 'package:flutter_knight_player/screens/all_music/allmusic.dart';
 import 'package:flutter_knight_player/screens/favorites/favorites.dart';
 import 'package:flutter_knight_player/screens/folders/folders.dart';
-import 'package:flutter_knight_player/screens/player.dart';
 import 'package:flutter_knight_player/screens/playlists/playlists.dart';
 import 'package:flutter_knight_player/screens/settings/settings.dart';
-
 import '../../const/colors.dart';
 
 class DashBoardHelpers {
-  screens(notifyTheme) {
+  screens(
+    List allMusicList,
+    List allFavorites,
+    bool listView,
+    String urlToPlay,
+    notifyParentPlaySong,
+    notifyFavorites,
+    notifyTheme,
+  ) {
     return <Widget>[
+      Folders(
+        notifyParentPlayer: notifyParentPlaySong,
+      ),
+      AllMusic(
+        allMusicList: allMusicList,
+        allFavoriteMusicList: allFavorites,
+        listView: listView,
+        urlToPlay: urlToPlay,
+        notifyParentPlayer: notifyParentPlaySong,
+        notifyParentfavourites: notifyFavorites,
+      ),
+      const Favorites(),
+      const Playlist(),
       Settings(
         notifyParentTheme: notifyTheme,
       ),
-      const AllMusic(),
-      const Folders(),
-      const Favorites(),
-      const Playlist(),
-      // const Player('j'),
     ];
   }
 
@@ -58,7 +72,7 @@ class DashBoardHelpers {
     );
   }
 
-  bottomNavBarHandler(setState, _selectedIndex) {
+  bottomNavBarHandler(stateHandler, _selectedIndex) {
     return BottomNavigationBar(
         currentIndex: _selectedIndex,
         iconSize: 30,
@@ -66,23 +80,17 @@ class DashBoardHelpers {
         unselectedItemColor: Colors.grey,
         selectedItemColor: KnightColors().secondaryColor(),
         // called when one tab is selected
-        onTap: (int index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
+        onTap: (int index) => {stateHandler(_selectedIndex, index)},
+
         // bottom tab items
         items: tabNamesHandler());
   }
 
-  navigationRailHelper(setState, _selectedIndex) {
+  navigationRailHelper(stateHandler, selectedIndex) {
     return NavigationRail(
-      onDestinationSelected: (int index) {
-        setState(() {
-          _selectedIndex = index;
-        });
-      },
-      selectedIndex: _selectedIndex,
+      onDestinationSelected: (int index) =>
+          {stateHandler(selectedIndex, index)},
+      selectedIndex: selectedIndex,
       destinations: tabDestinationHandler(),
 
       labelType: NavigationRailLabelType.all,

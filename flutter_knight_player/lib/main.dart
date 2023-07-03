@@ -1,6 +1,5 @@
 //import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_knight_player/screens/dashboard/dashboard.dart';
 import 'package:flutter_knight_player/screens/splashscreen/splashscreen.dart';
 import 'package:get/get.dart';
 // import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -31,7 +30,6 @@ bool themeModeDark = true;
 class _MyAppState extends State<MyApp> {
   changeTheme() {
     setState(() {
-      print(themeModeDark);
       themeModeDark = !themeModeDark;
     });
   }

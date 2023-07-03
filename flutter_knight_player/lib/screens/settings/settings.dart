@@ -1,45 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_knight_player/const/colors.dart';
+import 'package:flutter_knight_player/decorations/decoration.dart';
 import 'package:flutter_knight_player/main.dart';
-import 'package:get/get.dart';
-// import 'player.dart';
 
 class Settings extends StatefulWidget {
-  // const Settings({super.key});
   final Function notifyParentTheme;
-
-  // ignore: prefer_typing_uninitialized_variables
-
-  Settings({
+  const Settings({
     Key? key,
     required this.notifyParentTheme,
-  });
+  }) : super(key: key);
 
   @override
   State<Settings> createState() => _SettingsState();
 }
 
 class _SettingsState extends State<Settings> {
-  themeState() {
-    setState(() {
-      if (Get.isDarkMode) {
-        //Get.changeTheme(Get.isDarkMode ? ThemeData.light() : ThemeData.dark());
-        Get.changeTheme(ThemeData.light());
-      } else {
-        Get.changeTheme(ThemeData.dark());
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    // print(Get.isDarkMode);
-    return ListTile(
-      leading: IconButton(
-        icon: Icon(
-            themeModeDark ? Icons.abc_outlined : Icons.baby_changing_station),
-        onPressed: () => {widget.notifyParentTheme()},
+    return Container(
+      padding: const EdgeInsets.all(5),
+      child: Column(
+        children: [
+          ElevatedButton(
+              style: AllMusicDecorations().listButtonDecoration(),
+              onPressed: () => widget.notifyParentTheme(),
+              child: ListTile(
+                hoverColor: KnightColors().secondaryColor(),
+                title: Text(themeModeDark ? 'Dark theme' : 'Light Theme'),
+                trailing:
+                    Icon(!themeModeDark ? Icons.dark_mode : Icons.light_mode),
+              )),
+        ],
       ),
     );
-    //Get.to(Folders());
   }
 }

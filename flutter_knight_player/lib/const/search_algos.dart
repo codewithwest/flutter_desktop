@@ -1,58 +1,32 @@
 import 'dart:io';
-
-class AppGlobalsConst {
-  // Letters of the Alphabet
-  static List letters = [
-    'a',
-    'b',
-    'c',
-    'd',
-    'e',
-    'f',
-    'g',
-    'h',
-    'i',
-    'j',
-    'k',
-    'l',
-    'm',
-    'n',
-    'o',
-    'p',
-    'q',
-    'r',
-    's',
-    't',
-    'u',
-    'v',
-    'w',
-    'x',
-    'y',
-    'z'
-  ];
-  // Stores The DirectoryList
-  var allDirectoryList = [];
-  var allDrivesList = [];
-  // Stores all Music Files
-  var allFilesList = [];
-  // List of All Music File Type
-  List musicfileTypes = [
-    'm4a',
-    'mp3',
-    'wav',
-    'flac',
-    'aac',
-    'alac',
-    'aiff',
-    'dsd',
-    'pcm'
-  ];
-}
+import 'const_vars.dart';
 
 class AppGlobalFunctions extends AppGlobalsConst {
   // Converts string to lower case and return true if a substring is contained
   toStringtoLower(el, String subStrCheck) {
     return el.toString().toLowerCase().contains(subStrCheck);
+  }
+
+  checkifFolderIsEmpty(directoyPath) async {
+    var newListedDir = await directoyPath.list().isEmpty;
+    // directoyPath.listSync().toList();
+    return newListedDir;
+  }
+
+  // Checks if a folder/ file name contains variations
+  checkifContains(elementToCheck, List listToIterate) {
+    bool p = false;
+    for (var i = 0; i < listToIterate.length; i++) {
+      var downEl = elementToCheck.toString().toLowerCase();
+      var substr =
+          downEl.substring(downEl.lastIndexOf('\\') + 1, downEl.length);
+      if (downEl.contains(listToIterate[i]) ||
+          substr.startsWith('.') ||
+          (downEl.contains('file:') && !isAudioFileFormat(substr))) {
+        p = true;
+      }
+    }
+    return p;
   }
 
   // Checks the audio file formats that matches returns true if match
@@ -66,22 +40,15 @@ class AppGlobalFunctions extends AppGlobalsConst {
   }
 
 // Gets all Files from a directory tree
-  sortDirectoryFiles(directoryToCheck) async {
+  sortDirectoryFiles(directoyPath) async {
     // ignore: prefer_typing_uninitialized_variables
     var directoryList;
-    if (directoryToCheck.existsSync()) {
+    if (directoyPath.existsSync()) {
       try {
-        directoryList = await directoryToCheck.listSync().toList();
+        directoryList = await directoyPath.listSync().toList();
         for (var element in directoryList) {
           if (toStringtoLower(element, 'directory:')) {
-            toStringtoLower(element, 'windows') ||
-                    toStringtoLower(element, 'program files') ||
-                    toStringtoLower(element, 'perflogs') ||
-                    toStringtoLower(element, 'recovery') ||
-                    toStringtoLower(element, 'backup') ||
-                    toStringtoLower(element, 'drivers') ||
-                    toStringtoLower(element, 'appdata') ||
-                    toStringtoLower(element, 'programdata')
+            checkifContains(element, exceptionFolders)
                 ? print('not')
                 : allDirectoryList.add(element);
           } else {

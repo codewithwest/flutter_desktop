@@ -1,14 +1,13 @@
 import 'dart:io';
-//import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_knight_player/const/colors.dart';
-import 'package:flutter_knight_player/decorations/decoration.dart';
-import 'package:mime/mime.dart';
-import '../player.dart';
+import 'package:flutter_knight_player/const/search_algos.dart';
+import 'package:flutter_knight_player/decorations/folders_decorations.dart';
+import 'package:flutter_knight_player/decorations/folders_helpers.dart';
+import '../../const/const_vars.dart';
 
 class Folders extends StatefulWidget {
-  const Folders({super.key});
-
+  final Function(String) notifyParentPlayer;
+  const Folders({super.key, required this.notifyParentPlayer});
   @override
   State<Folders> createState() => _FoldersState();
 }
@@ -18,34 +17,7 @@ var data = File('./music');
 var dir = Directory('/');
 List? tall;
 List existingDir = [];
-List alpha = [
-  'a',
-  'b',
-  'c',
-  'd',
-  'e',
-  'f',
-  'g',
-  'h',
-  'i',
-  'j',
-  'k',
-  'l',
-  'm',
-  'n',
-  'o',
-  'p',
-  'q',
-  'r',
-  's',
-  't',
-  'u',
-  'v',
-  'w',
-  'x',
-  'y',
-  'z'
-];
+List alpha = AppGlobalsConst.letters;
 
 //FileSystemEvent f = FileReader() as FileSystemEvent;
 List listOfDir = [];
@@ -58,25 +30,24 @@ String locationTracker = '';
 
 class _FoldersState extends State<Folders> {
   dirFetch(desiredDir) async {
-    await desiredDir.list().toList().then((value) {
-      listOfDir = value;
-    });
-    if (desiredDir.existsSync()) {
+    if (await desiredDir.existsSync()) {
+      var dirToList = await desiredDir.listSync().toList();
+      var dirList = [];
+      for (var element in dirToList) {
+        if (!listOfDir.contains(element)) {
+          AppGlobalFunctions()
+                  .checkifContains(element, AppGlobalsConst().exceptionFolders)
+              ? true
+              : dirList.add(element);
+        }
+      }
       setState(() {
-        desiredDir.list().toList().then((value) {
-          listOfDir = value;
-        });
+        listOfDir = dirList;
       });
     }
   }
 
-  searchListener() {
-    setState(() {
-      searchRes = dirName.text.toString();
-    });
-  }
-
-  getIt(stringAtIndex, characta) {
+  direPathCreator(stringAtIndex, characta) {
     var newStr = '';
     for (int i = stringAtIndex.length - 2; i >= 0; i--) {
       //print(newStr);
@@ -89,8 +60,8 @@ class _FoldersState extends State<Folders> {
     }
   }
 
-//Loops through a list and checks which directories exists
-  checksLetters(letter) {
+//Loops through a list of letters and checks which directories exists
+  checksLetters(letter) async {
     for (var l = 0; l < alpha.length; l++) {
       //check matching dir letters
       if (letter == alpha[l] && letter != 'd') {
@@ -110,14 +81,17 @@ class _FoldersState extends State<Folders> {
     }
   }
 
-  checkFileSysExist(alpha) {
+// Check file sytems exists
+  checkFileSysExist(alpha) async {
     for (var i = 0; i < alpha.length; i++) {
-      checksLetters(alpha[i]);
+      await checksLetters(alpha[i]);
     }
   }
 
   addPath(fileSys) {
     setState(() {
+      // Set the route back to default when drive is clicked
+      routes = [];
       locationTracker = fileSys
           .replaceAll(RegExp(r'\\\*'), '')
           .replaceAll(RegExp(r'Directory:'), '')
@@ -127,289 +101,64 @@ class _FoldersState extends State<Folders> {
     routes.add(locationTracker);
   }
 
-  var k = Directory('/');
-
   addToPath(String directoryName, cLocal) {
-    var dN = directoryName.split('');
     setState(() {
       routes.add(directoryName);
-      locationTracker = routes.join('/');
+      locationTracker = routes.join('>');
     });
   }
 
 //Update path text on back button press
-  removeFromPath() {
+  removeFromPath() async {
+    print(routes);
     setState(() {
       if (routes.isNotEmpty) {
         routes.removeLast();
-        locationTracker = routes.join('/');
-        dirFetch(Directory(locationTracker.trim()));
+        locationTracker = routes.join('>');
+        dirFetch(Directory(routes.join('/').trim()));
       }
     });
-  }
-
-  isAudioFileCheck(String checkFile) {
-    String check =
-        checkFile.replaceAll('File:', '').replaceAll('\'', '').trim();
-    //print(check);
-    var ty = lookupMimeType(check);
-
-    isAudioFileReturn(String confirm) {
-      if (confirm.startsWith('audio/')) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-
-    if (isAudioFileReturn(ty.toString()) == true) {
-      return true;
-    } else {
-      return false;
-    }
-
-    // print(lookupMimeType('C:\Action!\Video\Action 11-6-2022 1-20-26 PM.mp4'));
   }
 
   @override
   Widget build(BuildContext context) {
     existingDir.isNotEmpty ? true : checkFileSysExist(alpha);
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
     var routeLength = routes.isEmpty;
     return SafeArea(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Expanded(
-              flex: 1,
-              child: Container(
-                  margin: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                      color: KnightColors().primaryTabColor(),
-                      border: Border.all(),
-                      boxShadow: [
-                        BoxShadow(
-                          color: KnightColors().secondaryColor(),
-                          blurRadius: 5,
-                          blurStyle: BlurStyle.solid,
-                        )
-                      ]),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                            border: Border.all(),
-                            borderRadius: BorderRadius.circular(100)),
-                        child: IconButton(
-                          onPressed: (() {
-                            removeFromPath();
-                          }),
-                          icon: Icon(
-                            routeLength ? Icons.home : Icons.arrow_back,
-                            shadows: [
-                              Shadow(
-                                  color: KnightColors().secondaryColor(),
-                                  blurRadius: 10)
-                            ],
-                          ),
-                          iconSize: 35,
-                        ),
-                      ),
-                      Expanded(
-                          child: Container(
-                              margin: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                              padding: const EdgeInsets.only(bottom: 3),
-                              decoration: routeLength
-                                  ? const BoxDecoration()
-                                  : BoxDecoration(
-                                      border: Border.all(),
-                                      color:
-                                          const Color.fromRGBO(22, 24, 24, 0.9),
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          blurStyle: BlurStyle.solid,
-                                          spreadRadius: .4,
-                                          color:
-                                              Color.fromRGBO(88, 100, 222, .5),
-                                        )
-                                      ],
-                                    ),
-                              child: Text(
-                                locationTracker,
-                                style: const TextStyle(
-                                  fontSize: 22,
-                                  overflow: TextOverflow.fade,
-                                ),
-                              )))
-                    ],
-                  ))),
-
-          Expanded(
+            flex: 1,
             child: Container(
-              margin: const EdgeInsets.fromLTRB(5, 0, 5, 0),
-              color: KnightColors().tabColor(),
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: existingDir.length,
-                itemBuilder: (context, index) {
-                  return Container(
-                    margin: const EdgeInsetsDirectional.all(5),
-                    child: ElevatedButton(
-                      style: AllMusicDecorations().buttonDecoration(),
-                      child: Column(
-                        children: [
-                          Icon(
-                            existingDir[index].toString().contains('c:')
-                                ? Icons.window_sharp
-                                : Icons.drive_file_move,
-                            size: 35,
-                          ),
-                          Text(existingDir[index]
-                              .toString()
-                              .toUpperCase()
-                              .replaceAll(RegExp(r'DIRECTORY:'), 'DRIVE')
-                              .replaceAll(RegExp(r"'"), ''))
-                        ],
-                      ),
-                      onPressed: () => {},
-                    ),
-                  );
-                },
+              margin: const EdgeInsets.all(2),
+              decoration: FoldersDecorations().foldersNavTabDeco,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  // Icon Container
+                  FoldersHelpers()
+                      .foldersNavIconContainer(routeLength, removeFromPath),
+                  // Route text cont
+                  FoldersHelpers().routeTextCont(routeLength, locationTracker)
+                ],
               ),
             ),
           ),
-          //calls drives if empty
-          locationTracker.isEmpty
-              ? Expanded(
-                  flex: 9,
-                  child: ListView.builder(
-                      itemCount: existingDir.length,
-                      itemBuilder: ((context, index) {
-                        bool k =
-                            existingDir[index].toString().startsWith('Dir');
-                        return ListTile(
-                          onTap: () async {
-                            if (locationTracker.isEmpty) {
-                              addPath(existingDir[index].toString());
-                              var km = existingDir[index]
-                                  .toString()
-                                  .replaceAll(RegExp(r'\\\*'), '')
-                                  .replaceAll(RegExp(r'Directory:'), '')
-                                  .replaceAll(RegExp(r"'"), '')
-                                  .trim()
-                                  .toUpperCase();
-                              dirFetch(Directory(km));
-                            } else {
-                              return;
-                            }
-                          },
-
-                          //trailing: Text(listOfDir[index].toString()),
-                          //iconColor: k ? Colors.green : Colors.blue,
-                          style: ListTileStyle.drawer,
-
-                          leading: Icon(
-                            k ? Icons.folder : Icons.file_copy,
-                            size: 36,
-                          ),
-                          iconColor: k
-                              ? const Color.fromRGBO(22, 150, 55, 7)
-                              : Colors.amber,
-                          dense: true,
-                          enabled: true,
-                          contentPadding: const EdgeInsets.all(5),
-                          minVerticalPadding: 10,
-                          hoverColor: const Color.fromRGBO(22, 22, 22, 0.6),
-                          visualDensity: VisualDensity.adaptivePlatformDensity,
-                          enableFeedback: true,
-                          title: locationTracker.isNotEmpty
-                              ? Text(getIt(listOfDir[index].toString(), '\\'))
-                              : Text(existingDir[index]
-                                  .toString()
-                                  .toUpperCase()
-                                  .replaceAll(RegExp(r'DIRECTORY:'), 'DRIVE')
-                                  .replaceAll(RegExp(r"'"), '')),
-                        );
-                      })))
-              //If the files and directories available
-              : Expanded(
-                  flex: 9,
-                  child: ListView.builder(
-                    itemCount: listOfDir.length,
-                    itemBuilder: ((context, index) {
-                      bool f = listOfDir[index].toString().startsWith('Dir');
-                      bool audioFile =
-                          listOfDir[index].toString().startsWith('.mp*');
-                      return ListTile(
-                        //trailing: Text(listOfDir[index].toString()),
-                        iconColor: f ? Colors.green : Colors.blue,
-                        style: ListTileStyle.drawer,
-                        leading: Icon(f ? Icons.folder : Icons.file_present),
-                        dense: true,
-                        onTap: () {
-                          f
-                              ? dirFetch(
-                                  Directory(
-                                    listOfDir[index]
-                                        .toString()
-                                        //.replaceAll(RegExp(r'\\'), '')
-                                        .replaceAll(RegExp(r'\\\*'), '')
-                                        .replaceAll(RegExp(r'Directory:'), '')
-                                        .replaceAll(RegExp(r"'"), '')
-                                        .replaceAll(RegExp(r'File:'), '')
-                                        // .replaceAll(RegExp(r'C:'), '')
-                                        .trim(),
-                                  ),
-                                )
-                              :
-                              // check if file is playable
-                              isAudioFileCheck(listOfDir[index].toString()) ==
-                                      true
-                                  ? Future.delayed(Duration(milliseconds: 1000),
-                                      () {
-                                      showModalBottomSheet(
-                                          isDismissible: true,
-                                          isScrollControlled: true,
-                                          context: context,
-                                          builder: (BuildContext ctx) {
-                                            double screenWidth =
-                                                MediaQuery.of(context)
-                                                    .size
-                                                    .width;
-                                            double screenHeight =
-                                                MediaQuery.of(context)
-                                                    .size
-                                                    .height;
-
-                                            return Player(
-                                                provideUrl: listOfDir[index]
-                                                    .toString()
-                                                    .replaceAll('/', '\\'));
-                                          });
-                                    })
-                                  : true;
-                          // : Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder: (context) => Folders(
-                          //             provideUrl:
-                          //                 listOfDir[index].toString())),
-                          //   );
-
-                          f
-                              ? addToPath(
-                                  getIt(listOfDir[index].toString(), '\\'),
-                                  locationTracker)
-                              : true;
-                        },
-                        title: Text(getIt(listOfDir[index].toString(), '\\')),
-                      );
-                    }),
-                  ),
-                )
+          FoldersHelpers().allfoldersTabView(
+            existingDir,
+            dirFetch,
+            listOfDir,
+            addPath,
+          ),
+          FoldersHelpers().directoryListingResolver(
+              listOfDir,
+              dirFetch,
+              AppGlobalFunctions().isAudioFileFormat,
+              addToPath,
+              direPathCreator,
+              locationTracker,
+              widget.notifyParentPlayer)
         ],
       ),
     );

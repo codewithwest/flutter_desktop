@@ -1,41 +1,41 @@
 import 'package:flutter_knight_player/const/colors.dart';
 import 'package:flutter_knight_player/decorations/decoration.dart';
-import 'package:mime/mime.dart';
 import 'package:audioplayers/audioplayers.dart';
 //import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_knight_player/screens/playlists/playlists.dart';
 //import 'package:time_formatter/time_formatter.dart';
 
 class AllMusicPlayer extends StatefulWidget {
   final Function(String) notifyParent;
+  final String provideUrl;
+  final bool isPlaying;
+  final List playersList;
 
   const AllMusicPlayer({
     required this.provideUrl,
     required this.notifyParent,
+    required this.playersList,
     Key? key,
+    required this.isPlaying,
   }) : super(key: key);
-  final String provideUrl;
 
   @override
   State<AllMusicPlayer> createState() => _PlayerState();
 }
 
 class _PlayerState extends State<AllMusicPlayer> {
-  //String provideUrl;
+  //String widget.provideUrl;
   bool isPlaying = false;
   AudioPlayer player = AudioPlayer();
   Duration duration = Duration.zero;
   Duration maxDuration = Duration.zero;
   Duration position = Duration.zero;
 
-  //String get provideUrl => null;
-
   @override
   void initState() {
     super.initState();
-
-    print(setAudio());
-
+    setAudio();
     //listen to states playing paused and stopped
 // Check if the play or pause button is played
     player.onPlayerStateChanged.listen((state) {
@@ -56,25 +56,29 @@ class _PlayerState extends State<AllMusicPlayer> {
   }
 
   Future setAudio() async {
+    if (widget.provideUrl.isEmpty) player.dispose();
+
     //play when completed
     var songName = widget.provideUrl
         .replaceAll(RegExp(r'\\'), '\\' "\\")
         .replaceAll('File:', '')
-        .replaceAll(RegExp(r"'"), '');
-    player.setReleaseMode(ReleaseMode.loop);
+        .replaceAll("'", '');
+    player.setReleaseMode(ReleaseMode.release);
+
     player.onSeekComplete;
-    print(player.getDuration());
     if (widget.provideUrl.isNotEmpty) {
       try {
         await player.play(UrlSource(songName));
       } catch (e) {
         widget.notifyParent("");
+        dispose();
       }
     }
   }
 
   @override
   void dispose() {
+    widget.notifyParent("");
     player.dispose();
     super.dispose();
   }

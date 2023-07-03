@@ -1,65 +1,6 @@
-// import 'package:flutter/material.dart';
-
-// class DriveLoadDialog extends StatefulWidget {
-//   const DriveLoadDialog({super.key});
-
-//   @override
-//   State<DriveLoadDialog> createState() => _DriveLoadDialogState();
-// }
-
-// class _DriveLoadDialogState extends State<DriveLoadDialog>
-//     with SingleTickerProviderStateMixin {
-//   late AnimationController _controller;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _controller = AnimationController(vsync: this);
-//   }
-
-//   @override
-//   void dispose() {
-//     _controller.dispose();
-//     super.dispose();
-//   }
-
-//   Future<void> _loadDrivesDialog() async {
-//     return showDialog<void>(
-//       context: context,
-//       barrierDismissible: false, // user must tap button!
-//       builder: (BuildContext context) {
-//         return AlertDialog(
-//           title: const Text('AlertDialog Title'),
-//           content: const SingleChildScrollView(
-//             child: ListBody(
-//               children: <Widget>[
-//                 Text('This is a demo alert dialog.'),
-//                 Text('Would you like to approve of this message?'),
-//               ],
-//             ),
-//           ),
-//           actions: <Widget>[
-//             TextButton(
-//               child: const Text('Done'),
-//               onPressed: () {
-//                 Navigator.of(context).pop();
-//               },
-//             ),
-//           ],
-//         );
-//       },
-//     );
-//   }
-
-//   @override
-//   Future build(BuildContext context) {
-//     return _loadDrivesDialog();
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import '../../const/colors.dart';
-import '../../const/global.dart';
+import '../../const/search_algos.dart';
 import '../../decorations/decoration.dart';
 
 listOfAvailableDirectories(availableDrives, someFun) {
